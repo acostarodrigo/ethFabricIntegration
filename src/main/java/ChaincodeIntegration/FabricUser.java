@@ -23,7 +23,7 @@ public class FabricUser implements User {
     private String secret;
 
 
-    public FabricUser(String name, String secret) throws EnrollmentException, InvalidArgumentException, MalformedURLException, IllegalAccessException, InvocationTargetException, org.hyperledger.fabric.sdk.exception.InvalidArgumentException, InstantiationException, NoSuchMethodException, CryptoException, ClassNotFoundException {
+    public FabricUser(String name, String secret, Boolean existing) throws EnrollmentException, InvalidArgumentException, MalformedURLException, IllegalAccessException, InvocationTargetException, org.hyperledger.fabric.sdk.exception.InvalidArgumentException, InstantiationException, NoSuchMethodException, CryptoException, ClassNotFoundException {
         caClient = HFCAClient.createNewInstance("ca.example.com",caURL, null);
         caClient.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
 
@@ -31,11 +31,20 @@ public class FabricUser implements User {
         this.mspId = "Org1MSP";
         this.secret = secret;
 
-        this.enrollment = caClient.enroll(this.name, this.secret);
+        if (existing)
+            this.enrollment = caClient.enroll(this.name, this.secret);
     }
 
     public String getName() {
         return this.name;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setEnrollment(Enrollment enrollment) {
+        this.enrollment = enrollment;
     }
 
     public Set<String> getRoles() {

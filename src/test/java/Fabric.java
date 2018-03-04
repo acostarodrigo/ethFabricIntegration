@@ -69,5 +69,8 @@ public class Fabric {
         // let's enroll it
         newUser.setEnrollment(caClient.enroll(newUser.getName(), newUser.getSecret()));
         assertNotNull(newUser.getEnrollment());
+
+        // lets leave the admin enrolled, just in case.
+        admin.setEnrollment(caClient.enroll(admin.getName(), admin.getSecret()));
     }
 }

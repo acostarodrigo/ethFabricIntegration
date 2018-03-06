@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.*;
 
-public class Fabric {
+public class FabricTest {
 
     private FabricUser admin;
     private FabricConnection connection;

@@ -8,10 +8,15 @@ import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.TransactionException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 
 public class FabricConnection {
+
+    private static final Logger log = LoggerFactory.getLogger(FabricConnection.class);
+
     private Channel channel;
     private HFClient client;
     private FabricUser user;

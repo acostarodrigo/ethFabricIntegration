@@ -1,4 +1,4 @@
-package BridgeIntegration;
+package BridgeIntegration.eth;
 
 public class EthereumListener {
 }

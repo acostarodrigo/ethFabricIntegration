@@ -1,15 +1,20 @@
 package network;
 
 
+import contracts.EventGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.ReadonlyTransactionManager;
 import org.web3j.tx.TransactionManager;
+import rx.Subscription;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -24,12 +29,12 @@ public class RinkebyNetwork {
     private static final Logger log = LoggerFactory.getLogger(RinkebyNetwork.class);
 
     // the Bridge contract
-    private ETHBridge contract;
+    private EventGenerator contract;
 
 
     private TransactionManager transactionManager;
     // the ETH address we are using to perform calls.
-    private final String PROGRAM_ADDESS = "0x00";
+    private final String PROGRAM_ADDRESS = "0x0284B395EceFBbAb8d90b294c8dE7C5DD1E410a2";
 
     // my own infura network url !! Test Network !!
     private final String INFURA_NETWORK = "https://rinkeby.infura.io/iDxnNnHTWuNN9INbkvXv";
@@ -44,7 +49,7 @@ public class RinkebyNetwork {
      * @throws NetworkException
      */
     public Web3j connect() throws NetworkException {
-        web3j = Web3j.build(new HttpService(INFURA_NETWORK));
+        web3j = Web3j.build(new HttpService());
 
         // let's request the client version to make sure we are connected.
         Web3ClientVersion web3ClientVersion = null;
@@ -55,7 +60,7 @@ public class RinkebyNetwork {
         } catch (IOException e) {
             this.clientVersion = null;
             log.error("Couldn't connect to RinkebyNetwork!");
-            throw new NetworkException("There was an error connecting to the ethereum blockchain");
+            throw new NetworkException("There was an error connecting to the ethereum blockchain. ",e);
         }
 
         return web3j;
@@ -86,19 +91,22 @@ public class RinkebyNetwork {
      * Loads the contract from the blockchain
      * @return
      */
-    public ETHBridge loadContract(){
+    public EventGenerator loadContract(){
         if (contract != null)
             return contract;
 
-        transactionManager = new ReadonlyTransactionManager(this.web3j, this.PROGRAM_ADDESS);
-        contract = ETHBridge.load(ETHBridge.ADDRESS, this.web3j, this.transactionManager,ETHBridge.GAS_PRICE, ETHBridge.GAS_LIMIT);
+        //transactionManager = new ReadonlyTransactionManager(this.web3j, this.PROGRAM_ADDRESS);
+        transactionManager = new ClientTransactionManager(this.web3j, this.PROGRAM_ADDRESS);
+        contract = EventGenerator.load(EventGenerator.ADDRESS, this.web3j, this.transactionManager,EventGenerator.GAS_PRICE, EventGenerator.GAS_LIMIT);
 
         return contract;
     }
 
 
     public void getContractEvents() throws InterruptedException, NetworkException {
+        this.getReady();
 
+        contract.depositEventObservable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST).subscribe((event -> System.out.println("Deposit event detected: " + event.recipient + " " + event.value.toString())),error -> System.out.println("Error: " + error.toString() ));
 
     }
 

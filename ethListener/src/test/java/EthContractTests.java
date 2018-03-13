@@ -1,3 +1,5 @@
+import contracts.ETHBridge;
+import contracts.EventGenerator;
 import network.NetworkException;
 import network.RinkebyNetwork;
 import org.junit.Test;
@@ -15,7 +17,7 @@ import static org.junit.Assert.*;
 public class EthContractTests {
     private RinkebyNetwork network;
     private Web3j web3j;
-    private ETHBridge contract;
+    private EventGenerator contract;
 
     /**
      * we need to connect to rinkeby blockchain to start tests
@@ -42,10 +44,10 @@ public class EthContractTests {
 
 
         TransactionManager transactionManager = new ClientTransactionManager(this.web3j, "");
-        contract = ETHBridge.load(ETHBridge.ADDRESS,this.web3j,transactionManager,ETHBridge.GAS_PRICE, ETHBridge.GAS_LIMIT);
+        contract = EventGenerator.load(EventGenerator.ADDRESS,this.web3j,transactionManager,ETHBridge.GAS_PRICE, ETHBridge.GAS_LIMIT);
         assertNotNull(contract);
 
-        contract.setContractAddress(ETHBridge.ADDRESS);
+        contract.setContractAddress(EventGenerator.ADDRESS);
         assertFalse(contract.isValid());
     }
 
@@ -71,7 +73,6 @@ public class EthContractTests {
         if (network == null)
             connectNetworkTest();
         int i = network.getRequiredSignatures();
-        assertNotNull(i);
         assertEquals(2,i);
     }
 

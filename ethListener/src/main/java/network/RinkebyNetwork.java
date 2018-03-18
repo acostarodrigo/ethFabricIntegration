@@ -5,19 +5,16 @@ import contracts.EventGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ClientTransactionManager;
-import org.web3j.tx.ReadonlyTransactionManager;
 import org.web3j.tx.TransactionManager;
-import rx.Subscription;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 
 /**
@@ -49,7 +46,7 @@ public class RinkebyNetwork {
      * @throws NetworkException
      */
     public Web3j connect() throws NetworkException {
-        web3j = Web3j.build(new HttpService());
+        web3j = Web3j.build(new HttpService("http://127.0.0.1:8545"));
 
         // let's request the client version to make sure we are connected.
         Web3ClientVersion web3ClientVersion = null;
@@ -103,11 +100,13 @@ public class RinkebyNetwork {
     }
 
 
-    public void getContractEvents() throws InterruptedException, NetworkException {
+    public ArrayList<String> getContractEvents() throws InterruptedException, NetworkException {
         this.getReady();
+        ArrayList<String> addresses = new ArrayList<>();
 
-        contract.depositEventObservable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST).subscribe((event -> System.out.println("Deposit event detected: " + event.recipient + " " + event.value.toString())),error -> System.out.println("Error: " + error.toString() ));
+        contract.depositEventObservable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST).subscribe((event -> addresses.add(event.recipient)),error -> System.out.println("Error: " + error.toString() ));
 
+        return addresses;
     }
 
     /**
@@ -138,5 +137,14 @@ public class RinkebyNetwork {
 
         if (contract == null)
             this.loadContract();
+    }
+
+    public String getAuthorities() throws Exception {
+        this.getReady();
+
+        //return contract.requiredSignatures().send().toString();
+        //return contract.authorities(BigInteger.ZERO).send()
+        return contract.getAuthority(BigInteger.ZERO).send();
+
     }
 }

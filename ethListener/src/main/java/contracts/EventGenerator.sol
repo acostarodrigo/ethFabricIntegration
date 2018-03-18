@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.21;
 
 contract EventGenerator {
     /// Event created on money deposit.
@@ -10,10 +10,10 @@ contract EventGenerator {
     /// the addresses of authorities that can allow the withdrawn
     address[] public authorities;
     /// the amount of signatures we will be requiring
-    uint256 public requiredSignatures;
+    uint8 public requiredSignatures;
 
     /// constructor
-    function EventGenerator(address[] authorities_param, uint256 requiredSignatures_param) public{
+    function EventGenerator(address[] authorities_param, uint8 requiredSignatures_param) public{
         for (uint i = 0; i < authorities_param.length;i++){
             authorities.push(authorities_param[i]);
         }
@@ -24,15 +24,15 @@ contract EventGenerator {
 
     /// Should be used to deposit money.
     function () public payable {
-        Deposit(msg.sender, msg.value);
+        emit Deposit(msg.sender, msg.value);
     }
 
     /// will be used to withdrawn the money
     function withdrawn(uint256 value) public{
-        Withdrawn(msg.sender, value);
+        emit Withdrawn(msg.sender, value);
     }
 
-    function getAuthority(uint index) public constant returns (address) {
+    function getAuthority(uint8 index) public constant returns (address) {
         return authorities[index];
     }
 }

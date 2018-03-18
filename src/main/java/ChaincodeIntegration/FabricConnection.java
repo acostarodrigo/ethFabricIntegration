@@ -1,10 +1,9 @@
 package ChaincodeIntegration;
 
-import org.hyperledger.fabric.sdk.Channel;
-import org.hyperledger.fabric.sdk.HFClient;
-import org.hyperledger.fabric.sdk.Peer;
+import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.CryptoException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
+import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.hyperledger.fabric.sdk.exception.TransactionException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.util.Collection;
 
 public class FabricConnection {
 
@@ -48,5 +48,18 @@ public class FabricConnection {
         // It always wants orderer, otherwise even query does not work
         channel.addOrderer(client.newOrderer("orderer.example.com", ordererURL));
         channel.initialize();
+    }
+
+
+    public void activateChaincode() throws InvalidArgumentException, ProposalException {
+        TransactionProposalRequest req = client.newTransactionProposalRequest();
+        ChaincodeID chaincodeID = ChaincodeID.newBuilder().setName("tokenIntegration").build();
+
+        req.setChaincodeID(chaincodeID);
+        req.setFcn("verifyEthContract");
+        req.setArgs(new String[] {"CAR1"});
+        Collection<ProposalResponse> resps = channel.sendTransactionProposal(req);
+
+        channel.sendTransaction(resps);
     }
 }

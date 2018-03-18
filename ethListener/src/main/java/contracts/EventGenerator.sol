@@ -14,7 +14,10 @@ contract EventGenerator {
 
     /// constructor
     function EventGenerator(address[] authorities_param, uint256 requiredSignatures_param) public{
-        authorities = authorities_param;
+        for (uint i = 0; i < authorities_param.length;i++){
+            authorities.push(authorities_param[i]);
+        }
+
         requiredSignatures = requiredSignatures_param;
 
     }
@@ -27,5 +30,9 @@ contract EventGenerator {
     /// will be used to withdrawn the money
     function withdrawn(uint256 value) public{
         Withdrawn(msg.sender, value);
+    }
+
+    function getAuthority(uint index) public constant returns (address) {
+        return authorities[index];
     }
 }

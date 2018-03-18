@@ -1,7 +1,13 @@
 import contracts.ETHBridge;
 import contracts.EventGenerator;
+import listener.ContractListener;
 import network.NetworkException;
 import network.RinkebyNetwork;
+import org.hyperledger.fabric.sdk.exception.CryptoException;
+import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
+import org.hyperledger.fabric.sdk.exception.ProposalException;
+import org.hyperledger.fabric.sdk.exception.TransactionException;
+import org.hyperledger.fabric_ca.sdk.exception.EnrollmentException;
 import org.junit.Test;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -10,6 +16,8 @@ import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.TransactionManager;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 
 import static org.junit.Assert.*;
 
@@ -74,6 +82,19 @@ public class EthContractTests {
             connectNetworkTest();
         int i = network.getRequiredSignatures();
         assertEquals(2,i);
+    }
+
+    @Test
+    public void getAuthoritiesTest() throws Exception {
+        if (network == null)
+            connectNetworkTest();
+        System.out.println(network.getAuthorities());
+    }
+
+    @Test
+    public void triggerChaincodeTest() throws IllegalAccessException, InstantiationException, CryptoException, InvalidArgumentException, InvocationTargetException, NetworkException, MalformedURLException, org.hyperledger.fabric_ca.sdk.exception.InvalidArgumentException, ClassNotFoundException, ProposalException, NoSuchMethodException, TransactionException, EnrollmentException, InterruptedException {
+        ContractListener listener = new ContractListener();
+        listener.triggerChaincode();
     }
 
 

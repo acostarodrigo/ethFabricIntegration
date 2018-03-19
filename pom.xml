@@ -23,6 +23,7 @@
     <modules>
         <module>ethListener</module>
         <module>fabricListener</module>
+        <module>integrator</module>
     </modules>
 
     <dependencies>

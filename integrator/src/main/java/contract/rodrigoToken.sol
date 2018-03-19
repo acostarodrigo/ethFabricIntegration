@@ -1,5 +1,10 @@
 pragma solidity ^0.4.16;
 
+
+/**
+* Used to limit methods calls to the owner of the contract.
+* Certain functions can only be called by the creator. Ownership can be transfered too.
+*/
 contract owned {
     address public owner;
 
@@ -19,6 +24,7 @@ contract owned {
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
+
 contract RodrigoToken {
     // Public variables of the token
     string public name;
@@ -31,11 +37,19 @@ contract RodrigoToken {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    // This generates a public event on the blockchain that will notify clients
-    event Transfer(address indexed from, address indexed to, uint256 value);
+    // list of approvers that can withdrawn from Fabric the token
+    address [] fabricApprovers;
+    // required numbers of signatures that need to be included from approvers to withdraw tokens from Fabric
+    uint8 fabricRequiredSignatures;
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
+
+    // This generates a public event on the blockchain that will notify clients
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    // Generates a public event when a token holder request to transfer tokens to Fabric
+    event FabricTransfer (address owner, uint256 value, uint256 txHash);
 
     /**
      * Constrctor function
@@ -45,12 +59,22 @@ contract RodrigoToken {
     function RodrigoToken(
         uint256 initialSupply,
         string tokenName,
-        string tokenSymbol
+        string tokenSymbol,
+        uint8 _fabricRequiredSignatures,
+        address[] _fabricApprovers
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
+
+        // the amount of required signatures from approvers to allow withdraws from fabric
+        fabricRequiredSignatures = _fabricRequiredSignatures;
+
+        // the list of required approvers that can allow fabric withdraws.
+        for (uint8 i = 0;i<_fabricApprovers.lenght();i++){
+            fabricApprovers.push(_fabricApprovers[i]);
+        }
     }
 
     /**
@@ -73,6 +97,15 @@ contract RodrigoToken {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
+
+    /**
+    * Changes the amount of required signatures to allow fabric withdraws.
+    * This value is originally set at creation but can be modified by the contract owner.
+    */
+    function setFabricRequiredSignatures(uint8 _number) onlyOwner public{
+        fabricRequiredSignatures = _number;
+    }
+
 
     /**
      * Transfer tokens

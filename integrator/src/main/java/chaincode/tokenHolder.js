@@ -1,7 +1,6 @@
-class TokenHolder {
-
-    constructor(address) {
-        this._address = address;
+module.exports = class TokenHolder {
+        constructor(address) {
+        this._address = address
     }
 
     get address() {

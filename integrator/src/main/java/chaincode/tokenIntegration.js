@@ -9,8 +9,8 @@ const shim = require('fabric-shim');
 const util = require('util');
 
 var Web3 = require('web3');
-var TokenHolder = require('./tokenHolder')
-var TokenWallet = require('./tokenWallet')
+const TokenWallet = require('./tokenWallet');
+
 var web3;
 
 /**
@@ -104,10 +104,30 @@ let Chaincode = class {
 
 
     async generateTokens(stub, args){
-        var tokenHolder = new TokenHolder(args[0]);
-        var tokenWallet = new TokenWallet(tokenHolder, args[1]);
+        if (args.length != 2) {
+            throw new Error('Incorrect number of arguments. Expecting address and balance.');
+        }
 
-        await stub.putState(tokenHolder.address, Buffer.from(JSON.stringify(tokenWallet)));
+        let wallet = {
+            address: args[0],
+            balance: args[1]
+        }
+
+        await stub.putState(args[0], Buffer.from(JSON.stringify(wallet)));
+    }
+
+    async queryToken(stub, args) {
+        if (args.length != 1) {
+            throw new Error('Incorrect number of arguments. Expecting address');
+        }
+        let address = args[0];
+
+        let wallet = await stub.getState(address); //get the car from chaincode state
+        if (!wallet || wallet.toString().length <= 0) {
+            throw new Error(address + ' does not exist: ');
+        }
+        console.log(wallet.toString());
+        return wallet;
     }
 };
 

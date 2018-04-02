@@ -1,0 +1,21 @@
+{
+  "name": "tokenwallet",
+  "version": "1.0.0",
+  "description": "Token integration test implements in node.js",
+  "engines": {
+    "node": ">=8.4.0",
+    "npm": ">=5.3.0"
+  },
+  "scripts": {
+    "start": "node tokenWallet.js"
+  },
+  "engine-strict": true,
+  "license": "Apache-2.0",
+  "dependencies": {
+    "ethrpc": "^5.1.4",
+    "fabric-shim": "unstable",
+    "web3": "^0.20.6"
+  },
+  "main": "tokenWallet.js",
+  "author": "Rodrigo Acosta"
+}
